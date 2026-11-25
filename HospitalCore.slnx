@@ -1,0 +1,19 @@
+<Solution>
+  <Folder Name="/src/" />
+  <Folder Name="/src/Api/">
+    <Project Path="src/Api/HospitalCore.Api/HospitalCore.Api.csproj" />
+  </Folder>
+  <Folder Name="/src/BuildingBlocks/">
+    <Project Path="src/BuildingBlocks/HospitalCore.SharedKernel/HospitalCore.SharedKernel.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/" />
+  <Folder Name="/src/Modules/Patients/">
+    <Project Path="src/Modules/Patients/HospitalCore.Modules.Patients.Application/HospitalCore.Modules.Patients.Application.csproj" />
+    <Project Path="src/Modules/Patients/HospitalCore.Modules.Patients.Domain/HospitalCore.Modules.Patients.Domain.csproj" />
+    <Project Path="src/Modules/Patients/HospitalCore.Modules.Patients.Infrastructure/HospitalCore.Modules.Patients.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/HospitalCore.Api.IntegrationTests/HospitalCore.Api.IntegrationTests.csproj" />
+    <Project Path="tests/HospitalCore.ArchitectureTests/HospitalCore.ArchitectureTests.csproj" />
+  </Folder>
+</Solution>

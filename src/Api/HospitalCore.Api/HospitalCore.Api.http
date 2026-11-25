@@ -1,0 +1,8 @@
+@HospitalCore.Api_HostAddress = http://localhost:5187
+
+### Health check
+GET {{HospitalCore.Api_HostAddress}}/health
+
+### OpenAPI document (Development only)
+GET {{HospitalCore.Api_HostAddress}}/openapi/v1.json
+Accept: application/json

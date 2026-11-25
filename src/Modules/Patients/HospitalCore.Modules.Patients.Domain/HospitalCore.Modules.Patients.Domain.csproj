@@ -1,0 +1,7 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\BuildingBlocks\HospitalCore.SharedKernel\HospitalCore.SharedKernel.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,5 @@
+# Normalize line endings in the repository; Git converts them on checkout.
+* text=auto
+
+*.sh text eol=lf
+*.cs diff=csharp
