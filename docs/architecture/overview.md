@@ -20,7 +20,7 @@ flowchart LR
     Staff(["Hospital staff"])
     Client["Client application<br/>(future web front end)"]
     Api["HospitalCore.Api"]
-    Sql[("SQL Server<br/>planned")]
+    Sql[("SQL Server 2025<br/>schema per module")]
     Redis[("Redis<br/>planned")]
 
     Staff --> Client --> Api
@@ -62,7 +62,9 @@ flowchart TB
 
 These rules are enforced by `tests/HospitalCore.ArchitectureTests`.
 
-## Request flow (target)
+## Request flow
+
+This is how `POST /api/patients` works today. Query handlers follow the same path without the domain operation and the save.
 
 ```mermaid
 sequenceDiagram
@@ -73,23 +75,25 @@ sequenceDiagram
     participant R as Repository (Infrastructure)
     participant DB as SQL Server
 
-    C->>Ctl: HTTP request
-    Ctl->>H: Command / query DTO
-    H->>R: Load aggregate
-    R->>DB: SQL
-    H->>D: Execute business operation
-    D-->>H: Domain events
-    H->>R: Save changes
-    R->>DB: SQL
-    H-->>Ctl: Result
-    Ctl-->>C: HTTP response (DTO or ProblemDetails)
+    C->>Ctl: POST /api/patients
+    Ctl->>H: RegisterPatientCommand
+    H->>D: Create value objects and Patient.Register(...)
+    D-->>H: Result (patient or validation error)
+    H->>R: Is the identity document already registered?
+    R->>DB: SELECT ... WHERE DocumentType = @t AND DocumentNumber = @n
+    H->>R: Add patient and save changes
+    R->>DB: INSERT INTO patients.Patients
+    H-->>Ctl: Result<Guid>
+    Ctl-->>C: 201 Created, or ProblemDetails (400 / 409)
 ```
 
 ## Cross-cutting concerns
 
 | Concern | Current state |
 | --- | --- |
-| Error handling | `AddProblemDetails`, `UseExceptionHandler` and `UseStatusCodePages` return RFC 9457 ProblemDetails responses |
+| Error handling | Expected failures travel as `Result` values with stable error codes and are mapped to RFC 9457 ProblemDetails (`400`, `404`, `409`) with a `code` extension. Unexpected exceptions are handled by `UseExceptionHandler` |
+| Persistence | EF Core 10 with one `DbContext` and one SQL Server schema per module; migrations applied explicitly with `dotnet ef` |
+| Time | `TimeProvider` is injected so date rules are deterministic in tests |
 | Health | `GET /health` liveness endpoint |
 | API documentation | Built-in OpenAPI document generation with Swagger UI in Development |
 | Logging | Default ASP.NET Core logging; structured logging provider to be decided |

@@ -8,9 +8,9 @@ An Architecture Decision Record (ADR) captures one significant decision, the con
 | --- | --- | --- |
 | [ADR-001](ADR-001-modular-monolith.md) | Modular monolith architecture | Accepted |
 | [ADR-002](ADR-002-clean-architecture.md) | Clean Architecture inside each module | Accepted |
-| ADR-003 | SQL Server and Entity Framework Core | Planned |
-| ADR-004 | CQRS | Planned |
-| ADR-005 | Domain-Driven Design | Planned |
+| [ADR-003](ADR-003-sql-server-and-ef-core.md) | SQL Server and Entity Framework Core | Accepted |
+| [ADR-004](ADR-004-cqrs.md) | CQRS without a mediator library | Accepted |
+| [ADR-005](ADR-005-domain-driven-design.md) | Domain-Driven Design tactical patterns | Accepted |
 | ADR-006 | Authentication and authorization | Planned |
 
 ## Writing a new ADR
