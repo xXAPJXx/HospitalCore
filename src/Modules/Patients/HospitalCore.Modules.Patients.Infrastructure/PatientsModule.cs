@@ -27,7 +27,7 @@ public static class PatientsModule
         });
 
         services.AddScoped<IPatientRepository, PatientRepository>();
-        services.AddScoped<IUnitOfWork>(serviceProvider => serviceProvider.GetRequiredService<PatientsDbContext>());
+        services.AddScoped<IUnitOfWork, PatientsUnitOfWork>();
 
         services.AddScoped<ICommandHandler<RegisterPatientCommand, Guid>, RegisterPatientCommandHandler>();
         services.AddScoped<IQueryHandler<GetPatientByIdQuery, PatientResponse>, GetPatientByIdQueryHandler>();

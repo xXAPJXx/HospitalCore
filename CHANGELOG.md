@@ -28,5 +28,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - README, architecture overview, ADR-001 (modular monolith) and ADR-002 (Clean Architecture).
 - GitHub Actions CI workflow: locked restore, format check, build and tests on every push and pull request to `main`.
 - NuGet lock files (`packages.lock.json`) for reproducible restores and CI caching.
+
+### Fixed
+
+- Concurrent registrations of the same identity document now return `409 Conflict` instead of `500`. SQL Server unique-key errors (2601, 2627) are translated into a `UniqueConstraintViolationException` by the Patients unit of work and mapped to `Patients.DocumentAlreadyRegistered` by the handler.
 - Branch protection documentation for the `main` ruleset (pull requests, required CI check, linear history).
 - MIT license.

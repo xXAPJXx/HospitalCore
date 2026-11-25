@@ -45,6 +45,17 @@ public sealed class RegisterPatientCommandHandlerTests
     }
 
     [Fact]
+    public async Task Handle_WhenSameDocumentIsRegisteredConcurrently_ReturnsConflict()
+    {
+        var handler = new RegisterPatientCommandHandler(_repository, new ConflictingUnitOfWork(), new FakeTimeProvider(Now));
+
+        var result = await handler.Handle(ValidCommand(), TestContext.Current.CancellationToken);
+
+        Assert.Equal(PatientErrors.DocumentAlreadyRegistered, result.Error);
+        Assert.Equal(ErrorType.Conflict, result.Error.Type);
+    }
+
+    [Fact]
     public async Task Handle_WithInvalidName_ReturnsValidationErrorAndDoesNotSave()
     {
         var command = ValidCommand() with { GivenName = "   " };

@@ -40,7 +40,16 @@ public sealed class RegisterPatientCommandHandler(
 
         var patient = registration.Value;
         patients.Add(patient);
-        await unitOfWork.SaveChangesAsync(cancellationToken);
+
+        try
+        {
+            await unitOfWork.SaveChangesAsync(cancellationToken);
+        }
+        catch (UniqueConstraintViolationException)
+        {
+            // Another request stored the same document between the existence check above and this insert.
+            return Result.Failure<Guid>(PatientErrors.DocumentAlreadyRegistered);
+        }
 
         return Result.Success(patient.Id.Value);
     }
