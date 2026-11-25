@@ -1,6 +1,7 @@
 # HospitalCore
 
 [![CI](https://github.com/xXAPJXx/HospitalCore/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/xXAPJXx/HospitalCore/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 **Modern Hospital Information System built with .NET 10.**
 
@@ -19,6 +20,7 @@ HospitalCore is a portfolio project that explores how a hospital information sys
 - [Quality gates](#quality-gates)
 - [Documentation](#documentation)
 - [Disclaimer](#disclaimer)
+- [License](#license)
 
 ## Goals
 
@@ -171,3 +173,7 @@ git switch main && git pull
 HospitalCore is an original work created for learning and portfolio purposes. It is inspired by general hospital management requirements and does not contain proprietary source code, database schemas, documentation or confidential information from any vendor or healthcare organisation. All data used in development and tests is synthetic.
 
 HospitalCore is not a certified medical device and must not be used to manage real patient data.
+
+## License
+
+HospitalCore is released under the [MIT License](LICENSE).
