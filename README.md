@@ -1,5 +1,7 @@
 # HospitalCore
 
+[![CI](https://github.com/xXAPJXx/HospitalCore/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/xXAPJXx/HospitalCore/actions/workflows/ci.yml)
+
 **Modern Hospital Information System built with .NET 10.**
 
 HospitalCore is a portfolio project that explores how a hospital information system can be designed with modern .NET engineering practices: a modular monolith, Clean Architecture, Domain-Driven Design and automated quality gates.
@@ -34,8 +36,8 @@ HospitalCore is a portfolio project that explores how a hospital information sys
 | Persistence | | Entity Framework Core 10, SQL Server 2025 |
 | Caching | | Redis |
 | Testing | xUnit v3 on Microsoft.Testing.Platform, `WebApplicationFactory` integration tests, NetArchTest architecture tests | Domain and application handler tests, database integration tests |
-| Tooling | Central Package Management, analyzers with warnings as errors, `dotnet format` | |
-| Delivery | | Docker, Docker Compose, GitHub Actions, Azure |
+| Tooling | Central Package Management with lock files, analyzers with warnings as errors, `dotnet format` | |
+| Delivery | GitHub Actions continuous integration | Docker, Docker Compose, Azure |
 
 ## Architecture
 
@@ -130,11 +132,14 @@ To use the `https` profile, trust the ASP.NET Core development certificate once 
 
 ## Quality gates
 
-Every change is expected to pass:
+The [CI workflow](.github/workflows/ci.yml) runs on every push and pull request to `main`. Every change must pass:
 
+- `dotnet restore --locked-mode`, so the build uses exactly the package versions recorded in `packages.lock.json`. NuGet audit runs during restore and, because warnings are errors, fails the build on known vulnerable packages.
+- `dotnet format --verify-no-changes`, driven by `.editorconfig`.
 - `dotnet build` with **warnings treated as errors** and the `latest-recommended` .NET analyzers.
 - `dotnet test`, including architecture tests that fail when a layer or module boundary is broken.
-- `dotnet format --verify-no-changes`, driven by `.editorconfig`.
+
+After changing package versions, run `dotnet restore` locally and commit the updated `packages.lock.json` files.
 
 ## Documentation
 
