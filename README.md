@@ -7,7 +7,7 @@
 
 HospitalCore is a portfolio project that explores how a hospital information system can be designed with modern .NET engineering practices: a modular monolith, Clean Architecture, Domain-Driven Design and automated quality gates.
 
-> **Status:** early scaffolding. The solution structure, quality gates and documentation are in place; no business features have been implemented yet.
+> **Status:** early development. The first feature, patient registration and lookup, is implemented end to end with domain, application, API and database tests.
 
 ## Table of contents
 
@@ -15,6 +15,7 @@ HospitalCore is a portfolio project that explores how a hospital information sys
 - [Technology stack](#technology-stack)
 - [Architecture](#architecture)
 - [Modules](#modules)
+- [API](#api)
 - [Solution structure](#solution-structure)
 - [Getting started](#getting-started)
 - [Quality gates](#quality-gates)
@@ -35,9 +36,10 @@ HospitalCore is a portfolio project that explores how a hospital information sys
 | --- | --- | --- |
 | Language and runtime | C# 14, .NET 10 (LTS) | |
 | API | ASP.NET Core Web API (controllers), OpenAPI document, Swagger UI, health checks, ProblemDetails | Authentication and authorization |
-| Persistence | | Entity Framework Core 10, SQL Server 2025 |
+| Architecture | Modular monolith, Clean Architecture, DDD tactical patterns, CQRS without a mediator library, Result pattern | Domain events, cross-module contracts |
+| Persistence | Entity Framework Core 10, SQL Server 2025, one schema per module | |
 | Caching | | Redis |
-| Testing | xUnit v3 on Microsoft.Testing.Platform, `WebApplicationFactory` integration tests, NetArchTest architecture tests | Domain and application handler tests, database integration tests |
+| Testing | xUnit v3 on Microsoft.Testing.Platform, domain and handler unit tests, `WebApplicationFactory` + Testcontainers (SQL Server 2025) integration tests, NetArchTest architecture tests | |
 | Tooling | Central Package Management with lock files, analyzers with warnings as errors, `dotnet format` | |
 | Delivery | GitHub Actions continuous integration | Docker, Docker Compose, Azure |
 
@@ -65,7 +67,7 @@ See [docs/architecture/overview.md](docs/architecture/overview.md) for the full 
 
 | Module | Responsibility | Status |
 | --- | --- | --- |
-| Patients | Patient registration, demographics and identification | Scaffolded |
+| Patients | Patient registration, demographics and identification | Registration and lookup |
 | Appointments | Outpatient scheduling | Planned |
 | Admissions | Inpatient admissions, transfers, discharges and bed management | Planned |
 | Laboratory | Lab orders and results | Planned |
@@ -74,6 +76,42 @@ See [docs/architecture/overview.md](docs/architecture/overview.md) for the full 
 | Administration | Users, catalogues and configuration | Planned |
 
 Modules are created when their first feature is implemented, not before.
+
+## API
+
+| Method | Route | Description | Responses |
+| --- | --- | --- | --- |
+| `POST` | `/api/patients` | Register a patient | `201` with `Location` header, `400` validation problem, `409` document already registered |
+| `GET` | `/api/patients/{id}` | Get a patient by identifier | `200`, `404` |
+| `GET` | `/health` | Liveness check | `200` |
+
+Example registration request:
+
+```json
+{
+  "givenName": "María",
+  "familyName": "García López",
+  "dateOfBirth": "1985-03-14",
+  "sex": "Female",
+  "documentType": "NationalId",
+  "documentNumber": "12.345.678-Z"
+}
+```
+
+Errors follow [RFC 9457](https://www.rfc-editor.org/rfc/rfc9457) (`application/problem+json`) and include a stable `code`, for example:
+
+```json
+{
+  "type": "https://tools.ietf.org/html/rfc9110#section-15.5.10",
+  "title": "Conflict",
+  "status": 409,
+  "detail": "A patient with the same identity document is already registered.",
+  "code": "Patients.DocumentAlreadyRegistered",
+  "traceId": "00-…"
+}
+```
+
+The full contract is available as an OpenAPI document at `/openapi/v1.json` and in Swagger UI at `/swagger` (Development only).
 
 ## Solution structure
 
@@ -93,10 +131,12 @@ HospitalCore/
 │           ├── HospitalCore.Modules.Patients.Application/
 │           └── HospitalCore.Modules.Patients.Infrastructure/
 ├── tests/
-│   ├── HospitalCore.Api.IntegrationTests/
-│   └── HospitalCore.ArchitectureTests/
+│   ├── HospitalCore.Api.IntegrationTests/       API + SQL Server (Testcontainers)
+│   ├── HospitalCore.ArchitectureTests/          Layer dependency rules
+│   └── HospitalCore.Modules.Patients.UnitTests/ Domain and handler tests
 ├── Directory.Build.props            Shared build settings for every project
 ├── Directory.Packages.props         Central NuGet package versions
+├── dotnet-tools.json                Local .NET tools (dotnet-ef)
 ├── global.json                      Pins the .NET 10 SDK and the test platform
 └── HospitalCore.slnx
 ```
@@ -107,11 +147,11 @@ HospitalCore/
 
 - [.NET SDK 10.0.404](https://dotnet.microsoft.com/download/dotnet/10.0) or a later 10.0 feature band. `global.json` pins the SDK, so a machine with .NET 11 installed still builds with .NET 10.
 - Git.
+- [Docker](https://www.docker.com/products/docker-desktop/), running, to execute the integration tests. They start a SQL Server 2025 container automatically.
+- To run the API locally: SQL Server 2025 (any edition, for example Developer) reachable at `localhost` with Windows authentication. To use a different server, set the `ConnectionStrings__HospitalCore` environment variable.
 - Optional: Visual Studio 2026, JetBrains Rider or Visual Studio Code with C# Dev Kit.
 
-SQL Server, Redis and Docker are not required yet.
-
-### Build, test and run
+### Build and test
 
 ```bash
 git clone https://github.com/xXAPJXx/HospitalCore.git
@@ -119,8 +159,21 @@ cd HospitalCore
 
 dotnet build
 dotnet test
+```
+
+### Create the database and run the API
+
+```bash
+dotnet tool restore
+dotnet ef database update \
+  --project src/Modules/Patients/HospitalCore.Modules.Patients.Infrastructure \
+  --startup-project src/Api/HospitalCore.Api \
+  --context PatientsDbContext
+
 dotnet run --project src/Api/HospitalCore.Api
 ```
+
+Run these commands from the repository root so that `global.json` selects the .NET 10 SDK.
 
 With the default `http` launch profile the API listens on `http://localhost:5187`:
 

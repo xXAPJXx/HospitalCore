@@ -8,6 +8,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Added
 
+- Patients module: register a patient (`POST /api/patients`) and get a patient by identifier (`GET /api/patients/{id}`).
+  - `Patient` aggregate with `PersonName` and `IdentityDocument` value objects and a strongly typed `PatientId`.
+  - Business rules: required and normalised names, date of birth not in the future and at most 150 years ago, normalised identity document unique per document type.
+  - CQRS command and query handlers returning `Result` values with stable error codes, mapped to RFC 9457 ProblemDetails.
+  - EF Core 10 persistence in the `patients` schema of SQL Server, with the `InitialPatients` migration.
+- Shared kernel primitives: `Result`, `Error`, `Entity` and command and query handler interfaces.
+- Unit tests for the Patients domain and application handlers, and API integration tests against SQL Server 2025 with Testcontainers.
+- `dotnet-ef` local tool manifest.
+- ADR-003 (SQL Server and EF Core), ADR-004 (CQRS) and ADR-005 (Domain-Driven Design).
+
 - Solution scaffolding for a modular monolith on .NET 10: API host, shared kernel and the Patients module (Domain, Application and Infrastructure projects).
 - `global.json` pinning the .NET 10 SDK and enabling Microsoft.Testing.Platform for `dotnet test`.
 - Shared build settings (`Directory.Build.props`) with nullable reference types, warnings as errors and recommended analyzers.

@@ -1,10 +1,8 @@
 using System.Net;
-using Microsoft.AspNetCore.Mvc.Testing;
 
 namespace HospitalCore.Api.IntegrationTests;
 
-public sealed class ApiSmokeTests(WebApplicationFactory<Program> factory)
-    : IClassFixture<WebApplicationFactory<Program>>
+public sealed class ApiSmokeTests(HospitalCoreApiFactory factory)
 {
     [Fact]
     public async Task GetHealth_ReturnsHealthy()

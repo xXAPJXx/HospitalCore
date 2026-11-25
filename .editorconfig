@@ -391,3 +391,11 @@ dotnet_naming_style.s_camelcase.capitalization = camel_case
 # Test projects: allow the Method_Scenario_ExpectedResult naming convention.
 [tests/**.cs]
 dotnet_diagnostic.CA1707.severity = none
+
+# HospitalCore is an application consumed only from C#; Visual Basic keyword clashes (e.g. "Error") are irrelevant.
+[*.cs]
+dotnet_diagnostic.CA1716.severity = none
+
+# EF Core migrations are generated code.
+[src/**/Migrations/*.cs]
+generated_code = true

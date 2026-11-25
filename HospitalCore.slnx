@@ -15,5 +15,6 @@
   <Folder Name="/tests/">
     <Project Path="tests/HospitalCore.Api.IntegrationTests/HospitalCore.Api.IntegrationTests.csproj" />
     <Project Path="tests/HospitalCore.ArchitectureTests/HospitalCore.ArchitectureTests.csproj" />
+    <Project Path="tests/HospitalCore.Modules.Patients.UnitTests/HospitalCore.Modules.Patients.UnitTests.csproj" />
   </Folder>
 </Solution>
