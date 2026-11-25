@@ -141,6 +141,25 @@ The [CI workflow](.github/workflows/ci.yml) runs on every push and pull request 
 
 After changing package versions, run `dotnet restore` locally and commit the updated `packages.lock.json` files.
 
+### Branch protection
+
+`main` is protected by a repository ruleset:
+
+- Changes reach `main` only through pull requests, merged with **squash** to keep a linear history.
+- The `Build and test` check from GitHub Actions must pass, on a branch that is up to date with `main`.
+- Review conversations must be resolved before merging.
+- Force pushes and branch deletion are blocked.
+
+Typical workflow:
+
+```bash
+git switch -c feature/short-description
+# commit your changes
+git push
+# open a pull request, wait for CI, squash and merge
+git switch main && git pull
+```
+
 ## Documentation
 
 - [Architecture overview](docs/architecture/overview.md)

@@ -18,3 +18,4 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - README, architecture overview, ADR-001 (modular monolith) and ADR-002 (Clean Architecture).
 - GitHub Actions CI workflow: locked restore, format check, build and tests on every push and pull request to `main`.
 - NuGet lock files (`packages.lock.json`) for reproducible restores and CI caching.
+- Branch protection documentation for the `main` ruleset (pull requests, required CI check, linear history).
