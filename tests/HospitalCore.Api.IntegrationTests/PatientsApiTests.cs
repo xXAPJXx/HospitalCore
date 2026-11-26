@@ -61,6 +61,32 @@ public sealed class PatientsApiTests(HospitalCoreApiFactory factory)
     }
 
     [Fact]
+    public async Task RegisterPatient_ConcurrentRequestsWithSameDocument_OneSucceedsAndTheRestConflict()
+    {
+        const int concurrentRequests = 8;
+        var cancellationToken = TestContext.Current.CancellationToken;
+        using var client = factory.CreateClient();
+        var request = ValidRequest(UniqueDocumentNumber());
+
+        var responses = await Task.WhenAll(Enumerable.Range(0, concurrentRequests)
+            .Select(_ => client.PostAsJsonAsync(PatientsUri, request, JsonOptions, cancellationToken)));
+
+        try
+        {
+            var statusCodes = responses.Select(response => response.StatusCode).ToList();
+            Assert.Single(statusCodes, HttpStatusCode.Created);
+            Assert.Equal(concurrentRequests - 1, statusCodes.Count(status => status == HttpStatusCode.Conflict));
+        }
+        finally
+        {
+            foreach (var response in responses)
+            {
+                response.Dispose();
+            }
+        }
+    }
+
+    [Fact]
     public async Task RegisterPatient_WithDateOfBirthInFuture_ReturnsValidationProblem()
     {
         var cancellationToken = TestContext.Current.CancellationToken;

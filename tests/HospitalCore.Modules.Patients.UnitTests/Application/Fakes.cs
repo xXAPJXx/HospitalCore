@@ -16,6 +16,12 @@ internal sealed class InMemoryPatientRepository : IPatientRepository
     public void Add(Patient patient) => Patients.Add(patient);
 }
 
+internal sealed class ConflictingUnitOfWork : IUnitOfWork
+{
+    public Task<int> SaveChangesAsync(CancellationToken cancellationToken) =>
+        throw new UniqueConstraintViolationException("Simulated concurrent registration of the same document.");
+}
+
 internal sealed class CountingUnitOfWork : IUnitOfWork
 {
     public int SaveChangesCalls { get; private set; }

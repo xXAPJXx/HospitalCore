@@ -51,5 +51,5 @@ Which database engine and data access technology should HospitalCore use, how sh
 ## Consequences
 
 - Read-heavy scenarios may later use projections or Dapper without changing the write model.
-- A unique-constraint violation caused by a race condition currently surfaces as an unhandled `DbUpdateException` (HTTP 500). It should be translated into a conflict result.
+- A unique-constraint violation caused by a race condition must not surface as an unhandled `DbUpdateException` (HTTP 500). Each module's unit of work translates SQL Server errors 2601 and 2627 into `UniqueConstraintViolationException`, a type owned by the Application layer, and handlers map it to a conflict result.
 - Every new module adds its own schema, `DbContext` and migrations folder.
